@@ -19,13 +19,14 @@ SmartEvents.prototype.addEventListener = function (name, cb){
 /**
  * Dispara las funciones anidadas a un evento determinado adjunto.
  * @param {String} name Nombre del evento
- * @param {Object} [data] Data arbitraria pasada en el disparo del evento.
+ * @param {*} [data1] Data arbitraria pasada en el disparo del evento.
+ * @param {*} [data2] Data arbitraria pasada en el disparo del evento.
  */
-SmartEvents.prototype.dispatchEvent = function (name, data) {
+SmartEvents.prototype.dispatchEvent = function (name, data1, data2) {
   if (this.events && this.events[name]) {
     const _this = this
     this.events[name].forEach(function (cb) {
-      cb.call(_this, data);
+      cb.call(_this, data1, data2);
     })
   }
 };

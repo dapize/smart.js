@@ -28,20 +28,16 @@ Smart.prototype.registerComponent = function (name, obj) {
   this.components.set(name, componentsOptions);
 
   // Notifier
-  const notiData = Object.assign({
-    name: name,
-  }, componentsOptions);
+  const notiData = Object.assign({}, componentsOptions);
   delete notiData.constructor;
   delete notiData.instance;
 
   // Noti global
-  this.dispatchEvent('component:registered', notiData);
+  this.dispatchEvent('component:registered', name, notiData);
 
   // Noti local
   setTimeout(function () {
-    let dataLocal = Object.assign({}, notiData);
-    delete dataLocal.name;
-    componentsOptions.instance.dispatchEvent('registered', dataLocal);
+    componentsOptions.instance.dispatchEvent('registered', notiData);
   }, 0);
   
   return componentsOptions.instance;
@@ -91,11 +87,23 @@ Smart.prototype.createComponent = function (name, obj) {
     }
   };
 
+  // Inserting styles, if have styles
+  if (component.hasOwnProperty('styles')) {
+    const tagStyle = document.createElement('style');
+    tagStyle.type = 'text/css';
+    tagStyle.innerHTML = component.styles;
+    tagStyle.id = name;
+    document.body.appendChild(tagStyle);
+  };
 
-  // Notifier
-  component.instance.dispatchEvent('created', objData);
-  this.dispatchEvent('component:created', Object.assign({name: name}, objData));
-  
+  // Noti global
+  this.dispatchEvent('component:registered', name, cTemplate);
+
+  // Noti local
+  setTimeout(function () {
+    component.instance.dispatchEvent('created', cTemplate);
+  }, 0);
+
   // Return instance
-  return new fnConstructor(name);
+  return component.instance;
 };

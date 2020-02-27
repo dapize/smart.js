@@ -6,8 +6,9 @@
       
     }
   });
-
   const Smart = root.Smart;
+
+
 
   //#region register
   const c = {
@@ -48,51 +49,36 @@
       paragraph.classList.add('red');
     }
   };
-
-  // componente completo
   Smart.registerComponent('info-card', {
     template: c.template,
     styles: c.styles,
     schema: c.schema,
     script: c.script
   });
-
-  // componente de presentación
-  Smart.registerComponent('block-left', {
-    template: c.template,
-    styles: c.styles
-  });
-
-  // componente de funcionalidad con data
-  Smart.registerComponent('resizer-slider', {
-    schema: c.schema,
-    script: c.script
-  });
-
-  // componente de funcionalidad sin data
-  Smart.registerComponent('resizer-slider', {
-    script: c.script
-  });
-
-
   //#endregion register
+  
+
+
   
   //#region create
 
-  //#region web-component-example
-    /*
-      <c-info-card
-        title="Costo Cero"
-        image="../../assets/images/premio.png"
-        description="Sin cobro de mantenimiento ni gasto por operaciones"
-      ></c-info-card>
-    */
-  //#endregion web-component-example
+  /*
+    <c-info-card
+      title="Costo Cero"
+      image="../../assets/images/premio.png"
+      description="Sin cobro de mantenimiento ni gasto por operaciones"
+    ></c-info-card>
+  */
 
   Smart.addEventListener('component:registered', function (name, data) {
+    console.log('componente registrado: ' + name);
+    console.log('su data es:');
+    console.log(data);
 
-    Smart.addEventListener('component:created', function (name, node) {
-      
+    Smart.addEventListener('component:created', function (cName, node) {
+      console.log('Componente creado:' + cName);
+      console.log('el Nodo es:');
+      console.log(node)
     });
 
     Smart.createComponent(data.name, {
