@@ -7,7 +7,6 @@
 function Smart(obj) {
   if (!obj) obj = {};
   SmartEvents.call(this);
-  this.elements = new Map();
   this.components = new Map();
   this.modules = new Map();
 };

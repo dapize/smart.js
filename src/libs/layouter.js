@@ -1,6 +1,8 @@
-(function (root) {
-        'use strict';
-        const utils = {
+
+/**
+ * Utilidades de layouter
+ */
+const uLayouter = {
   /**
    * Obtiene el width y las columnas de los breakpoints.
    * @param {Object} objBps Objeto de los breakPoints
@@ -142,7 +144,7 @@
   createStyles: function (type, bps, instance) {
     const sizes = instance.sizes;
     const prefix = instance.prefix;
-    const prop = utils.processors[type].ruleCss;
+    const prop = uLayouter.processors[type].ruleCss;
     const styles = {};
     let rule, bpSplited, bp1, bp2, direct = false, nameClass, propAndVal;
     Object.keys(bps).forEach(function (bp, index) {
@@ -253,16 +255,16 @@
    * Setea los paddings y margenes
    */
   padsAndMargs: function (Node, type, instance) {
-    if (!Node) return utils.regError('Non-existent Node', "Don't exists the Node for processing.");
+    if (!Node) return uLayouter.regError('Non-existent Node', "Don't exists the Node for processing.");
     const params = instance.getParameters(Node);
     const _this = this;
-    if (!params.hasOwnProperty(type)) return utils.regError('Parameter Missing', "Don't exists the param '" + type + "' determined");
+    if (!params.hasOwnProperty(type)) return uLayouter.regError('Parameter Missing', "Don't exists the param '" + type + "' determined");
 
     const bpCals = {};
     let paramProcessed, numbersPures, propValue, bps;
     params[type].forEach(function (param) {
 
-      paramProcessed = utils.prepareParam(param);
+      paramProcessed = uLayouter.prepareParam(param);
       numbersPures = paramProcessed.numbers;
       bps = paramProcessed.breakPoints;
 
@@ -294,7 +296,7 @@
     // removing param
     Node.removeAttribute(type);
   }
-}
+};
 
 /**
  * Construtor maestro del sistema.
@@ -303,7 +305,7 @@
  */
 function Layouter (config) {
   // validation
-  if (!config.hasOwnProperty('breakPoints')) return utils.regError('Configuration Missing', '¡configuration missing! :V');
+  if (!config.hasOwnProperty('breakPoints')) return uLayouter.regError('Configuration Missing', '¡configuration missing! :V');
 
   // configs
   this.prefix = config.prefix ? config.prefix + '-' : ''
@@ -311,12 +313,12 @@ function Layouter (config) {
   // init setterss
   const bps = config.breakPoints;
   this.breakPoints = Object.keys(bps);
-  this.sizes = utils.getNums(bps, 'width');
-  this.cols = utils.getNums(bps, 'cols');
-  this.scope = utils.createScopeStyles();
+  this.sizes = uLayouter.getNums(bps, 'width');
+  this.cols = uLayouter.getNums(bps, 'cols');
+  this.scope = uLayouter.createScopeStyles();
   this.styles = {};
 };
-const lProto = Layouter.prototype;
+const lytProto = Layouter.prototype;
 
 Layouter.version = '1.0Beta';
 
@@ -325,10 +327,10 @@ Layouter.version = '1.0Beta';
  * @param {Object} Nodo Nodo de donde obtener los parametros.
  * @returns {Object}
  */
-lProto.getParameters = function (Node) {
+lytProto.getParameters = function (Node) {
   const params = {};
   const attrs = Node.attributes;
-  const paramNames = Object.keys(utils.processors);
+  const paramNames = Object.keys(uLayouter.processors);
   Array.prototype.forEach.call(attrs, function (attr) {
     if (paramNames.indexOf(attr.name) !== -1) {
       if (attr.value !== '') params[attr.name] = attr.value.split(' ');
@@ -341,11 +343,11 @@ lProto.getParameters = function (Node) {
  * Asigna los estilos necesarios a un nodo referentes a las columnas determinadas
  * @param {Object} Node Nodo a donde asignar los estilos
  */
-lProto.setCols = function (Node) {
-  if (!Node) return utils.regError('Non-existent Node', "Don't exists the Node for processing.");
+lytProto.setCols = function (Node) {
+  if (!Node) return uLayouter.regError('Non-existent Node', "Don't exists the Node for processing.");
   const _this = this;
   const params = this.getParameters(Node);
-  if (!params.hasOwnProperty('cols')) return utils.regError('Parameter Missing', "Don't exists 'cols' determined");
+  if (!params.hasOwnProperty('cols')) return uLayouter.regError('Parameter Missing', "Don't exists 'cols' determined");
   let cols, bp, bpCals = {};
 
   // Getting numbers
@@ -353,7 +355,7 @@ lProto.setCols = function (Node) {
   params.cols.forEach(function (param) {
     selectorName = param;
 
-    paramPrepared = utils.prepareParam(param);
+    paramPrepared = uLayouter.prepareParam(param);
     bp = paramPrepared.breakPoints;
     param = paramPrepared.numbers;
 
@@ -364,13 +366,13 @@ lProto.setCols = function (Node) {
         if (bp.indexOf('-') === -1) {
           cols = [param, _this.cols[bp]];
         } else {
-          utils.regError('SyntaxError', "You can't determine a 'until breakpoint' when use the explicit columns max");
+          uLayouter.regError('SyntaxError', "You can't determine a 'until breakpoint' when use the explicit columns max");
         }
       } else {
         cols = [param, _this.cols.xs];
       }
     }
-    propValue = utils.calPercentage(cols[0], cols[1]);
+    propValue = uLayouter.calPercentage(cols[0], cols[1]);
 
     bpCals[bp] = {
       name: selectorName,
@@ -378,7 +380,7 @@ lProto.setCols = function (Node) {
     };
   });
   // Creating, inserting, and adding classNames of rules in Node.
-  utils.settingCss({
+  uLayouter.settingCss({
     type: 'cols',
     bps: bpCals,
     instance: this,
@@ -393,26 +395,26 @@ lProto.setCols = function (Node) {
  * Setea los paddings necesarios para un Nodo.
  * @param {String} Node Nodo vivo del DOM a asignarle el CSS
  */
-lProto.setPads = function (Node) {
-  utils.padsAndMargs(Node, 'pad', this);
+lytProto.setPads = function (Node) {
+  uLayouter.padsAndMargs(Node, 'pad', this);
 };
 
 /**
  * Setea los margins necesarios para un Nodo.
  * @param {String} Node Nodo vivo del DOM a asignarle el CSS
  */
-lProto.setMars = function (Node) {
-  utils.padsAndMargs(Node, 'mar', this);
+lytProto.setMars = function (Node) {
+  uLayouter.padsAndMargs(Node, 'mar', this);
 };
 
 /**
  * Setea la propiedad Flex y las reglas designadas
  * @param {Object} Node Nodo vivo del DOM a asignarle el CSS
  */
-lProto.setFlex = function (Node) {
-  if (!Node) return utils.regError('Non-existent Node', "Don't exists the Node for processing.");
+lytProto.setFlex = function (Node) {
+  if (!Node) return uLayouter.regError('Non-existent Node', "Don't exists the Node for processing.");
   const params = this.getParameters(Node);
-  if (!params.hasOwnProperty('flex')) return utils.regError('Parameter Missing', "Don't exists 'flex' determinated.");
+  if (!params.hasOwnProperty('flex')) return uLayouter.regError('Parameter Missing', "Don't exists 'flex' determinated.");
   let bpNameS, bpCals = {};
 
   // Getting numbers
@@ -420,21 +422,21 @@ lProto.setFlex = function (Node) {
   params.flex.forEach(function (param) {
     selectorName = param;
 
-    paramPrepared = utils.prepareParam(param);
+    paramPrepared = uLayouter.prepareParam(param);
     bpNameS = paramPrepared.breakPoints;
     param = paramPrepared.numbers;
 
     flexSplited = param.split(':');
     nameProp = flexSplited[0];
-    if (utils.flexpv.hasOwnProperty(nameProp)) {
+    if (uLayouter.flexpv.hasOwnProperty(nameProp)) {
       valProp = flexSplited[1];
-      if (utils.flexpv.hasOwnProperty(valProp)) {
-        propVal = utils.flexpv[nameProp] + ':' + utils.flexpv[flexSplited[1]]
+      if (uLayouter.flexpv.hasOwnProperty(valProp)) {
+        propVal = uLayouter.flexpv[nameProp] + ':' + uLayouter.flexpv[flexSplited[1]]
       } else {
-        return utils.regError('Non-existent Alias', "Don't exists the alias '" + valProp + "' in Flex vault.");
+        return uLayouter.regError('Non-existent Alias', "Don't exists the alias '" + valProp + "' in Flex vault.");
       }
     } else {
-      return utils.regError('Non-existent Alias', "Don't exists the alias '" + nameProp + "' in Flex vault.");
+      return uLayouter.regError('Non-existent Alias', "Don't exists the alias '" + nameProp + "' in Flex vault.");
     }
 
     if (bpCals.hasOwnProperty(bpNameS)) {
@@ -450,7 +452,7 @@ lProto.setFlex = function (Node) {
   });
 
   // Creating Styles, inserting, and adding classNames of rules in Node.
-  utils.settingCss({
+  uLayouter.settingCss({
     type: 'flex',
     bps: bpCals,
     instance: this,
@@ -465,24 +467,16 @@ lProto.setFlex = function (Node) {
  * Procesa todos los atributos de procesamiento que se tenga disponible
  * @param {Object} Nodo Nodo vivo del DOM a asignarle el CSS
  */
-lProto.build = function (Node) {
-  if (!Node) return utils.regError('Non-existent Node', "Don't exists the Node for processing.");
+lytProto.build = function (Node) {
+  if (!Node) return uLayouter.regError('Non-existent Node', "Don't exists the Node for processing.");
   const params = this.getParameters(Node);
   const proNames = Object.keys(params);
   const _this = this;
   if (proNames.length) {
     proNames.forEach(function (processorName) {
-      _this[utils.processors[processorName].method](Node);
+      _this[uLayouter.processors[processorName].method](Node);
     });
   } else {
-    utils.regError('Parameter Missing', "don't exists any parameter to process")
+    uLayouter.regError('Parameter Missing', "don't exists any parameter to process")
   }
 };
-      
-        // Export Layouter
-        if (typeof module === "object" && module.exports) {
-          module.exports = Layouter;
-        } else {
-          root.Layouter = Layouter;
-        }
-      })(this);

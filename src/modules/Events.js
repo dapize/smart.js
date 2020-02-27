@@ -6,7 +6,6 @@ function SmartEvents () {
   this.events = null;
 };
 
-
 /**
  * Se suscribe a un evento
  * @param {String} name Nombre del evento a suscribirce.
@@ -16,7 +15,6 @@ SmartEvents.prototype.addEventListener = function (name, cb){
   if (!this.events) this.events = {};
   (this.events[name]) ? this.events[name].push(cb) : this.events[name] = [cb];
 };
-
 
 /**
  * Dispara las funciones anidadas a un evento determinado adjunto.
@@ -31,7 +29,6 @@ SmartEvents.prototype.dispatchEvent = function (name, data) {
     })
   }
 };
-
 
 /**
  * Elimina un evento suscrito. Si no se determina una función en el segundo parametro, todos las funciones suscritas al evento serán removidas.
