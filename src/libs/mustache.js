@@ -1,14 +1,8 @@
-// This file has been generated from mustache.mjs
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global = global || self, global.Mustache = factory());
-}(this, (function () { 'use strict';
-
+(function (root) {
   /*!
-   * mustache.js - Logic-less {{mustache}} templates with JavaScript
-   * http://github.com/janl/mustache.js
-   */
+  * mustache.js - Logic-less {{mustache}} templates with JavaScript
+  * http://github.com/janl/mustache.js
+  */
 
   var objectToString = Object.prototype.toString;
   var isArray = Array.isArray || function isArrayPolyfill (object) {
@@ -735,6 +729,6 @@
   mustache.Context = Context;
   mustache.Writer = Writer;
 
-  return mustache;
-
-})));
+  // EXPORTING
+  root.Schema = mustache;
+}(this));
