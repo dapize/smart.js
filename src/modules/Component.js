@@ -97,7 +97,7 @@ Smart.prototype.createComponent = function (name, obj) {
   };
 
   // Noti global
-  this.dispatchEvent('component:registered', name, cTemplate);
+  this.dispatchEvent('component:created', name, cTemplate);
 
   // Noti local
   setTimeout(function () {

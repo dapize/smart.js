@@ -6,11 +6,37 @@
       
     }
   });
-  const Smart = root.Smart;
 
 
 
-  //#region register
+  /*
+    <c-info-card
+      title="Costo Cero"
+      image="../../assets/images/premio.png"
+      description="Sin cobro de mantenimiento ni gasto por operaciones"
+    ></c-info-card>
+  */
+
+ Smart.addEventListener('component:registered', function (name, data) {
+    console.log('componente registrado: ' + name);
+    console.log('su data es:');
+    console.log(data);
+
+    Smart.addEventListener('component:created', function (cName, node) {
+      console.log('Componente creado:' + cName);
+      console.log('el Nodo es:');
+      console.log(node)
+    });
+
+    Smart.createComponent('info-card', {
+      image: '../../assets/images/premio.png',
+      title: 'Costo Cero',
+      description: 'Sin cobro de mantenimiento ni gasto por operaciones'
+    });
+
+  });
+
+ 
   const c = {
     schema: {
       image: {
@@ -55,40 +81,5 @@
     schema: c.schema,
     script: c.script
   });
-  //#endregion register
-  
-
-
-  
-  //#region create
-
-  /*
-    <c-info-card
-      title="Costo Cero"
-      image="../../assets/images/premio.png"
-      description="Sin cobro de mantenimiento ni gasto por operaciones"
-    ></c-info-card>
-  */
-
-  Smart.addEventListener('component:registered', function (name, data) {
-    console.log('componente registrado: ' + name);
-    console.log('su data es:');
-    console.log(data);
-
-    Smart.addEventListener('component:created', function (cName, node) {
-      console.log('Componente creado:' + cName);
-      console.log('el Nodo es:');
-      console.log(node)
-    });
-
-    Smart.createComponent(data.name, {
-      image: '../../assets/images/premio.png',
-      title: 'Costo Cero',
-      description: 'Sin cobro de mantenimiento ni gasto por operaciones'
-    });
-
-  });
-
-  //#endregion create
 
 }(this));

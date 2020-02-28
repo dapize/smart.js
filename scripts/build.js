@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const Terser = require('terser');
 
@@ -7,28 +6,24 @@ const sourceFolder = './src/';
 // Libs
 const libsFolder = sourceFolder + 'libs/';
 const libsPath = [
-  libsFolder + 'layouter.js',
   libsFolder + 'mustache.js',
+  libsFolder + 'layouter.js',
   libsFolder + 'schema.js'
 ];
 
-// Core
-const core = [
-  sourceFolder + 'utils.js',
-  sourceFolder + 'constructor.js'
-];
-
-// Modules
 const modulesFolder = sourceFolder + 'modules/';
-const modulesPath = [
+
+// Core
+const files = [
+  sourceFolder + 'utils.js',
   modulesFolder + 'Events.js',
+  sourceFolder + 'constructor.js',
   modulesFolder + 'Component.js',
   modulesFolder + 'Module.js',
 ];
 
-
 const readFile = filepath => fs.readFileSync(filepath);
-const content = [].concat(libsPath, core, modulesPath)
+const content = [].concat(libsPath, files)
                 .map(readFile)
                 .join('\n') + '\n';
 
