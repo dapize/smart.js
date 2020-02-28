@@ -7,7 +7,6 @@ const sourceFolder = './src/';
 const libsFolder = sourceFolder + 'libs/';
 const libsPath = [
   libsFolder + 'mustache.js',
-  libsFolder + 'layouter.js',
   libsFolder + 'schema.js'
 ];
 

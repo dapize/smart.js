@@ -22,6 +22,7 @@ Smart.prototype.registerComponent = function (name, obj) {
     styles: obj.styles || null,
     schema: obj.schema || null,
     template: obj.template || null,
+    script: obj.script || null,
     constructor: SmartRegisterComponent,
     instance: new SmartRegisterComponent()
   };
@@ -64,11 +65,21 @@ Smart.prototype.createComponent = function (name, obj) {
   };
 
   // Building template
-  let cTemplate = null;
+  let cTemplate = null, divTemp = null;
   if (component.hasOwnProperty('template')) {
     // creating DOM Nodes
-    const divTemp = document.createElement('div');
+    divTemp = document.createElement('div');
     divTemp.innerHTML = Mustache.render(component.template, cData);
+    // Cleaning options attributes
+    let attrs;
+    Array.prototype.forEach.call(divTemp.querySelectorAll('*'), function (node) {
+      attrs = node.attributes;
+      if (attrs.length) {
+        Array.prototype.forEach.call(attrs, function (attr) {
+          if (attr.value === '[]') setTimeout(function () { node.removeAttribute(attr.name) }, 0);
+        });
+      }
+    });
     cTemplate = divTemp.firstChild;
   };
 
@@ -76,10 +87,11 @@ Smart.prototype.createComponent = function (name, obj) {
   if (component.hasOwnProperty('script')) {
     const _this = this;
     if (cTemplate) {
-      const ctargets = cTemplate.querySelectorAll('[component]');
+      const ctargets = divTemp.querySelectorAll('[component]');
       if (ctargets.length) {
         Array.prototype.forEach.call(ctargets, function (target) {
           component.script.call(_this, target, cData);
+          target.removeAttribute('component');
         });
       }
     } else {

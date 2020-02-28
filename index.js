@@ -8,7 +8,6 @@
   });
 
 
-
   /*
     <c-info-card
       title="Costo Cero"
@@ -16,16 +15,11 @@
       description="Sin cobro de mantenimiento ni gasto por operaciones"
     ></c-info-card>
   */
-
- Smart.addEventListener('component:registered', function (name, data) {
-    console.log('componente registrado: ' + name);
-    console.log('su data es:');
-    console.log(data);
-
+ 
+  Smart.addEventListener('component:registered', function (name, data) {
     Smart.addEventListener('component:created', function (cName, node) {
-      console.log('Componente creado:' + cName);
-      console.log('el Nodo es:');
-      console.log(node)
+      console.timeEnd('empieza');
+      document.body.appendChild(node);
     });
 
     Smart.createComponent('info-card', {
@@ -33,11 +27,23 @@
       title: 'Costo Cero',
       description: 'Sin cobro de mantenimiento ni gasto por operaciones'
     });
-
   });
 
- 
-  const c = {
+  console.time('empieza');
+  Smart.registerComponent('info-card', {
+
+    template: `<div class="lh-content__slider__item-wrap" component>
+        <div class="lh-content__slider__item">
+          <img src="{{image}}" title="[{{image-title}}]" alt="[{{image-alt}}]" class="lh-content__slider__image">
+          <div class="lh-content__slider__text">
+            <{{title-tag}} class="lh-content__slider__title lh-typo__commontitle lh-typo__commontitle--1">{{title}}</{{title-tag}}>
+            <p class="lh-typo__p3 lh-content__slider__description">{{description}}</p>
+          </div>
+        </div>
+      </div>;`,
+
+    styles: `.red {color: red !important;}`,
+
     schema: {
       image: {
         type: 'string',
@@ -58,28 +64,12 @@
         required: true
       }
     },
-    template: `
-      <div class="lh-content__slider__item-wrap" component>
-        <div class="lh-content__slider__item">
-          <img src="{{image}}" {{#image-title}}title="{{image-title}}"{{/image-title}} {{#image-alt}}alt="{{image-alt}}"{{/image-alt}} class="lh-content__slider__image">
-          <div class="lh-content__slider__text">
-            <{{title-tag}} class="lh-content__slider__title lh-typo__commontitle lh-typo__commontitle--1">{{title}}</{{title-tag}}>
-            <p class="lh-typo__p3 lh-content__slider__description">{{description}}</p>
-          </div>
-        </div>
-      </div>;`,
-    styles: `.red {color: red !important;}`,
+
     script: function (component, data) {
+      console.log('script ejhecutado');
       const paragraph = component.querySelector('.lh-typo__p3');
-      console.log(paragraph.textContent);
       paragraph.classList.add('red');
     }
-  };
-  Smart.registerComponent('info-card', {
-    template: c.template,
-    styles: c.styles,
-    schema: c.schema,
-    script: c.script
   });
 
 }(this));
