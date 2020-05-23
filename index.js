@@ -24,12 +24,11 @@
 
     Smart.createComponent('info-card', {
       image: '../../assets/images/premio.png',
-      title: 'Costo Cero',
-      description: 'Sin cobro de mantenimiento ni gasto por operaciones'
+      title: 'Costo Cero'
     });
   });
 
-  console.time('empieza');
+
   Smart.registerComponent('info-card', {
 
     template: `<div class="lh-content__slider__item-wrap" component>
@@ -37,7 +36,9 @@
           <img src="{{image}}" title="[{{image-title}}]" alt="[{{image-alt}}]" class="lh-content__slider__image">
           <div class="lh-content__slider__text">
             <{{title-tag}} class="lh-content__slider__title lh-typo__commontitle lh-typo__commontitle--1">{{title}}</{{title-tag}}>
+            {{#description}}
             <p class="lh-typo__p3 lh-content__slider__description">{{description}}</p>
+            {{/description}}
           </div>
         </div>
       </div>;`,
@@ -59,16 +60,14 @@
         type: 'string',
         default: 'h4'
       },
-      description: {
-        type: 'string',
-        required: true
-      }
+      description: 'string'
     },
 
     script: function (component, data) {
-      console.log('script ejhecutado');
       const paragraph = component.querySelector('.lh-typo__p3');
-      paragraph.classList.add('red');
+      if (paragraph) {
+        paragraph.classList.add('red');
+      }
     }
   });
 
