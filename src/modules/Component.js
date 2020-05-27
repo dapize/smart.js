@@ -5,8 +5,8 @@
  * @param {Object} [obj] Objeto de opciones del elemento.
  */
 Smart.prototype.registerComponent = function (name, obj) {
-  if (typeof name !== 'string') return regError('Nombre Inadecuado', 'No se declaró correctamente el nombre del componente a registrar.');
-  if (this.components.has(name)) return regError('Componente Duplicado', 'Ya se había registrado el componente "' + name + '".');
+  if (typeof name !== 'string') return this.utils.regError('Nombre Inadecuado', 'No se declaró correctamente el nombre del componente a registrar.');
+  if (this.components.has(name)) return this.utils.regError('Componente Duplicado', 'Ya se había registrado el componente "' + name + '".');
   if (!obj) obj = {};
 
   // Creating constructor
@@ -18,7 +18,7 @@ Smart.prototype.registerComponent = function (name, obj) {
 
 
   // Saving in vault
-  const componentsOptions = {
+  const componentOpts = {
     styles: obj.styles || null,
     schema: obj.schema || null,
     template: obj.template || null,
@@ -26,22 +26,15 @@ Smart.prototype.registerComponent = function (name, obj) {
     constructor: SmartRegisterComponent,
     instance: new SmartRegisterComponent()
   };
-  this.components.set(name, componentsOptions);
+  this.components.set(name, componentOpts);
 
   // Notifier
-  const notiData = Object.assign({}, componentsOptions);
+  const notiData = Object.assign({}, componentOpts);
   delete notiData.constructor;
   delete notiData.instance;
+  this.utils.notify(this, componentOpts.instance, 'registered', name, notiData);
 
-  // Noti global
-  this.dispatchEvent('component:registered', name, notiData);
-
-  // Noti local
-  setTimeout(function () {
-    componentsOptions.instance.dispatchEvent('registered', notiData);
-  }, 0);
-  
-  return componentsOptions.instance;
+  return componentOpts.instance;
 };
 
 
@@ -51,53 +44,11 @@ Smart.prototype.registerComponent = function (name, obj) {
  */
 Smart.prototype.createComponent = function (name, obj) {
   if (!obj) obj = {};
-  if (!this.components.has(name)) return regError('Componente Inexistente', 'No se puede crear el componente "' + name + '", porque no está registrado.');
+  if (!this.components.has(name)) return this.utils.regError('Componente Inexistente', 'No se puede crear el componente "' + name + '", porque no está registrado.');
+  const _this = this;
 
   // Getting componente
   const component = this.components.get(name);
-
-  // Building Data (with the schema)
-  let cData = null;
-  if (component.hasOwnProperty('schema')) {
-    const cSchema = new Schema(component.schema);
-    if (!cSchema.validate(obj)) return regError('Data inválida', 'No fué posible crear el componente "' + name + '", ya que su data es inválida.');
-    cData = cSchema.compile();
-  };
-
-  // Building template
-  let cTemplate = null, divTemp = null;
-  if (component.hasOwnProperty('template')) {
-    // creating DOM Nodes
-    divTemp = document.createElement('div');
-    divTemp.innerHTML = Mustache.render(component.template, cData);
-    // Cleaning options attributes
-    let attrs;
-    Array.prototype.forEach.call(divTemp.querySelectorAll('*'), function (node) {
-      attrs = node.attributes;
-      if (attrs.length) {
-        Array.prototype.forEach.call(attrs, function (attr) {
-          if (attr.value === '[]') setTimeout(function () { node.removeAttribute(attr.name) }, 0);
-        });
-      }
-    });
-    cTemplate = divTemp.firstChild;
-  };
-
-  // Executing the script
-  if (component.hasOwnProperty('script')) {
-    const _this = this;
-    if (cTemplate) {
-      const ctargets = divTemp.querySelectorAll('[component]');
-      if (ctargets.length) {
-        Array.prototype.forEach.call(ctargets, function (target) {
-          component.script.call(_this, target, cData);
-          target.removeAttribute('component');
-        });
-      }
-    } else {
-      component.script.call(_this, null, cData);
-    }
-  };
 
   // Inserting styles, if have styles
   if (component.hasOwnProperty('styles')) {
@@ -108,14 +59,45 @@ Smart.prototype.createComponent = function (name, obj) {
     document.body.appendChild(tagStyle);
   };
 
-  // Noti global
-  this.dispatchEvent('component:created', name, cTemplate);
+  // Building Data (with the schema)
+  let cData = null;
+  if (component.hasOwnProperty('schema')) {
+    const cSchema = new Schema(component.schema);
+    if (!cSchema.validate(obj)) return this.utils.regError('Data inválida', 'No fué posible crear el componente "' + name + '", ya que su data es inválida.');
+    cData = cSchema.compile();
+  };
 
-  // Noti local
-  setTimeout(function () {
-    component.instance.dispatchEvent('created', cTemplate);
-  }, 0);
+  // Building template
+  if (component.hasOwnProperty('template')) {
+    // creating DOM Nodes
+    const divTemp = document.createElement('div');
+    divTemp.innerHTML = Mustache.render(component.template, cData);
 
+    // Cleaning optionals attributes
+    let allNodes = this.utils.toArray(divTemp.querySelectorAll('*'));
+    this.utils.nodeCleaner(allNodes, function () {
+      // layouter executing
+      _this.utils.layouter(_this.layouter, divTemp, function () {
+
+        // Executing the script with template
+        const nodeComponent = divTemp.querySelector('[component]');
+        if (nodeComponent) {
+          component.script.call(_this, nodeComponent, cData);
+          nodeComponent.removeAttribute('component');
+        };
+
+        // Notifier
+        _this.utils.notify(_this, component.instance, 'created', name, divTemp.firstChild);
+      });
+    });
+  } else {
+    // Executing the script withouth template
+    if (component.hasOwnProperty('script')) component.script.call(_this, null, cData);
+
+    // Notifier
+    this.utils.notify(this, component.instance, 'created', name, null);
+  };
+  
   // Return instance
   return component.instance;
 };

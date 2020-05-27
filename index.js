@@ -17,21 +17,23 @@
   */
  
   Smart.addEventListener('component:registered', function (name, data) {
+    console.time('info-card')
     Smart.addEventListener('component:created', function (cName, node) {
-      console.timeEnd('empieza');
+      console.timeEnd('info-card');
       document.body.appendChild(node);
     });
 
     Smart.createComponent('info-card', {
       image: '../../assets/images/premio.png',
-      title: 'Costo Cero'
+      title: 'Costo Cero',
+      description: 'Esta es una descripción extraña'
     });
   });
 
 
   Smart.registerComponent('info-card', {
 
-    template: `<div class="lh-content__slider__item-wrap" component>
+    template: `<div class="lh-content__slider__item-wrap" cols="10/20" component>
         <div class="lh-content__slider__item">
           <img src="{{image}}" title="[{{image-title}}]" alt="[{{image-alt}}]" class="lh-content__slider__image">
           <div class="lh-content__slider__text">

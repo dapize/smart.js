@@ -8,7 +8,6 @@ function Smart(obj) {
   if (!obj) obj = {};
   SmartEvents.call(this);
   this.components = new Map();
-  this.modules = new Map();
 };
 Smart.prototype = Object.create(SmartEvents.prototype);
 Smart.prototype.constructor = Smart;

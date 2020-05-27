@@ -1,36 +1,49 @@
 const fs = require('fs');
 const Terser = require('terser');
 
+// paths
 const sourceFolder = './src/';
+const libsFolder = sourceFolder + 'libs/';
+const modulesFolder = sourceFolder + 'modules/';
+
+// utils
+const readFile = filepath => fs.readFileSync(filepath);
+const joiner = function (arr) {
+  return arr.map(readFile).join('\n') + '\n';
+};
+const minifer = function (code) {
+  const mini = Terser.minify({ 'name.js': code }, {
+    output: {
+      comments: false
+    }
+  });
+  if (mini.error) console.log(mini.error);
+  if (mini.warnings) console.log(mini.warnings);
+  return mini.code;
+};
 
 // Libs
-const libsFolder = sourceFolder + 'libs/';
-const libsPath = [
+const allLibs = [
   libsFolder + 'mustache.js',
-  libsFolder + 'schema.js'
+  libsFolder + 'schema.js',
+  libsFolder + 'layouter.js'
 ];
-
-const modulesFolder = sourceFolder + 'modules/';
+const libs = joiner(allLibs);
 
 // Core
 const files = [
-  sourceFolder + 'utils.js',
-  modulesFolder + 'Events.js',
+  modulesFolder + 'events.js',
   sourceFolder + 'constructor.js',
-  modulesFolder + 'Component.js',
-  modulesFolder + 'Module.js',
+  modulesFolder + 'template.js',
+  sourceFolder + 'utils.js',
+  modulesFolder + 'component.js',
 ];
-
-const readFile = filepath => fs.readFileSync(filepath);
-const content = [].concat(libsPath, files)
-                .map(readFile)
-                .join('\n') + '\n';
-
 if (!fs.existsSync('./dist')) fs.mkdirSync('./dist');
 
 // Smart.js
-const smartPath = './dist/smart.js';
+const content = joiner(files);
 const smartCode = `
+${libs}
 (function (root) {
   'use strict';
 
@@ -43,16 +56,9 @@ ${content}
     root.Smart = Smart;
   }
 })(this);`
+const smartPath = './dist/smart.js';
 fs.writeFileSync(smartPath, smartCode, 'utf8');
 
-// min
-const result = Terser.minify({ 'smart.js': smartCode }, {
-  output: {
-    comments: false
-  }
-});
 let smartPathMin = smartPath.split('.');
 smartPathMin.pop();
-fs.writeFileSync('.' + smartPathMin.join('') + '.min.js', result.code, 'utf8');
-if (result.error) console.log(result.error);
-if (result.warnings) console.log(result.warnings);
+fs.writeFileSync('.' + smartPathMin.join('') + '.min.js', minifer(smartCode), 'utf8');
