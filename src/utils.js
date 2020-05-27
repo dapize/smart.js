@@ -56,15 +56,16 @@ utils.nodeCleaner = function (nodes, cb) {
 
 /**
  * Procesa una lista de nodos
- * @param {Array} nodes Lista de nodos vivos HTML
+ * @param {Object} instance Instancia del Layouter
+ * @param {Node} node Nodo HTML
  * @param {Function} cb Callback
  */
 utils.layouter = function (instance, node, cb) {
   const nodes = node.querySelectorAll('[cols], [pad], [padt], [padr], [padb], [padl], [mar], [mart], [marr], [marb], [marl], [flex]');
   if (!nodes.length) return cb();
   const setNodes = new Set();
-  Array.prototype.forEach.call(nodes, function (div) {
-    setNodes.add(div);
+  Array.prototype.forEach.call(nodes, function (iNode) {
+    if (iNode.nodeName.toLowerCase().substring(0, 2) !== 'c-') setNodes.add(iNode);
   });
   setNodes.forEach(function (div) {
     instance.set(div)
@@ -72,6 +73,14 @@ utils.layouter = function (instance, node, cb) {
   cb();
 };
 
+/**
+ * Notifica de forma local o global
+ * @param {Object} _this Instancia Smart.
+ * @param {Object} componentInstance Instancia del componente
+ * @param {String} eventName Nombre del evento
+ * @param {String} componentName Nombre del componente
+ * @param {Object|Node} data Data del componente o Nodo HTML
+ */
 utils.notify = function (_this, componentInstance, eventName, componentName, data) {
   // Noti global
   _this.dispatchEvent('component:' + eventName, componentName, data);

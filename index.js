@@ -15,8 +15,9 @@
       description="Sin cobro de mantenimiento ni gasto por operaciones"
     ></c-info-card>
   */
- 
+
   Smart.addEventListener('component:registered', function (name, data) {
+
     console.time('info-card')
     Smart.addEventListener('component:created', function (cName, node) {
       console.timeEnd('info-card');
@@ -30,10 +31,9 @@
     });
   });
 
-
   Smart.registerComponent('info-card', {
 
-    template: `<div class="lh-content__slider__item-wrap" cols="10/20" component>
+    template: `<div class="lh-content__slider__item-wrap" component>
         <div class="lh-content__slider__item">
           <img src="{{image}}" title="[{{image-title}}]" alt="[{{image-alt}}]" class="lh-content__slider__image">
           <div class="lh-content__slider__text">
@@ -72,5 +72,6 @@
       }
     }
   });
+
 
 }(this));
