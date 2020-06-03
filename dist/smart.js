@@ -895,7 +895,10 @@
    * @returns {Object} El objeto fusionado con los valores por defecto en el esquema (si es que existen claro).
    */
   Schema.prototype.compile = function (obj) {
-    if (obj) this.validate(obj);
+    if (obj) {
+      console.log('objeto a procesar: ', obj);
+      this.validate(obj);
+    }
     return this.missings.required.length ? false : this.compiled;
   };
   
@@ -2093,28 +2096,15 @@ function Smart(obj) {
   if (!obj) obj = {};
   SmartEvents.call(this);
   this.components = new Map();
+  if (obj.hasOwnProperty('layouter')) {
+    Smart.prototype.layouter = new Layouter(obj.layouter);
+  } else {
+    this.utils.regError('Falta configuración', 'Se necesita designar la configuración del layouter.');
+  }
 };
 Smart.prototype = Object.create(SmartEvents.prototype);
 Smart.prototype.constructor = Smart;
 
-Smart.prototype.layouter = new Layouter({
-  breakPoints: {
-    xs: {
-      width: 320,
-      cols: 15,
-      direct: true
-    },
-    sm: {
-      width: 768,
-      cols: 31
-    },
-    md: {
-      width: 1024,
-      cols: 31
-    }
-  },
-  bridge: false
-});
 const utils = {};
 
 /**
@@ -2230,14 +2220,22 @@ Smart.prototype.registerComponent = function (name, obj) {
 
   // Saving in vault
   const componentOpts = {
-    styles: obj.styles || null,
-    schema: obj.schema || null,
+    schema: obj.schema ? new Schema(obj.schema) : null,
     template: obj.template || null,
     script: obj.script || null,
     constructor: SmartRegisterComponent,
     instance: new SmartRegisterComponent()
   };
   this.components.set(name, componentOpts);
+
+  // Inserting styles, if have styles
+  if (obj.hasOwnProperty('styles')) {
+    const tagStyle = document.createElement('style');
+    tagStyle.type = 'text/css';
+    tagStyle.innerHTML = obj.styles;
+    tagStyle.id = name;
+    document.body.appendChild(tagStyle);
+  };
 
   // Notifier
   const notiData = Object.assign({}, componentOpts);
@@ -2261,28 +2259,20 @@ Smart.prototype.createComponent = function (name, obj) {
   // Getting componente
   const component = this.components.get(name);
 
-  // Inserting styles, if have styles
-  if (component.hasOwnProperty('styles')) {
-    const tagStyle = document.createElement('style');
-    tagStyle.type = 'text/css';
-    tagStyle.innerHTML = component.styles;
-    tagStyle.id = name;
-    document.body.appendChild(tagStyle);
-  };
-
   // Building Data (with the schema)
   let cData = null;
   if (component.hasOwnProperty('schema')) {
-    const cSchema = new Schema(component.schema);
-    if (!cSchema.validate(obj)) return this.utils.regError('Data inválida', 'No fué posible crear el componente "' + name + '", ya que su data es inválida.');
-    cData = cSchema.compile();
+    if (!component.schema.validate(obj)) return this.utils.regError('Data inválida', 'No fué posible crear el componente "' + name + '", ya que su data es inválida.');
+    console.log('la data a compilar es: ', obj);
+    cData = component.schema.compile(obj);
+    console.log('la data compilada es: ', cData);
   };
 
   // Building template
   if (component.hasOwnProperty('template')) {
     // creating DOM Nodes
     const divTemp = document.createElement('div');
-    divTemp.innerHTML = Mustache.render(component.template, cData);
+    divTemp.innerHTML = cData ? Mustache.render(component.template, cData) : component.template;
 
     // Cleaning optionals attributes
     let allNodes = this.utils.toArray(divTemp.querySelectorAll('*'));

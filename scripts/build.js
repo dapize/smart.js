@@ -34,7 +34,6 @@ const libs = joiner(allLibs);
 const files = [
   modulesFolder + 'events.js',
   sourceFolder + 'constructor.js',
-  modulesFolder + 'template.js',
   sourceFolder + 'utils.js',
   modulesFolder + 'component.js',
 ];

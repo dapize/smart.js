@@ -154,7 +154,10 @@
    * @returns {Object} El objeto fusionado con los valores por defecto en el esquema (si es que existen claro).
    */
   Schema.prototype.compile = function (obj) {
-    if (obj) this.validate(obj);
+    if (obj) {
+      console.log('objeto a procesar: ', obj);
+      this.validate(obj);
+    }
     return this.missings.required.length ? false : this.compiled;
   };
   

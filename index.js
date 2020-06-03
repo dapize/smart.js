@@ -3,7 +3,26 @@
   // Init APP
   root.Smart = new Smart({
     layouter: {
-      
+      breakPoints: {
+        xs: {
+          width: 320,
+          cols: 15,
+          direct: true
+        },
+        sm: {
+          width: 768,
+          cols: 31
+        },
+        md: {
+          width: 1024,
+          cols: 31
+        },
+        lg: {
+          width: 1280,
+          cols: 31
+        }
+      },
+      bridge: false
     }
   });
 
@@ -29,6 +48,12 @@
       title: 'Costo Cero',
       description: 'Esta es una descripción extraña'
     });
+
+    Smart.createComponent('info-card', {
+      image: '../../assets/images/premio2.png',
+      title: 'Costo Cero 2',
+      description: 'Esta es una descripción extraña 2'
+    });
   });
 
   Smart.registerComponent('info-card', {
@@ -39,7 +64,7 @@
           <div class="lh-content__slider__text">
             <{{title-tag}} class="lh-content__slider__title lh-typo__commontitle lh-typo__commontitle--1">{{title}}</{{title-tag}}>
             {{#description}}
-            <p class="lh-typo__p3 lh-content__slider__description">{{description}}</p>
+            <p cols="1/1" class="lh-typo__p3 lh-content__slider__description">{{description}}</p>
             {{/description}}
           </div>
         </div>
