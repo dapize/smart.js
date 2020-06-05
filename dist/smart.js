@@ -741,12 +741,25 @@
 })));
 (function (root) {
   'use strict';
-  /**
+    /**
    * Utilidades varias
    * @namespace uSchema
    * @property {Array} typesAccepted Lista de tipos aceptados para ser procesados.
    */
   const uSchema = {
+    /**
+     * Setea los valores por defecto del constructor
+     * @param {Function} _this Constructor
+     */
+    initValues: function (_this) {
+      _this.missings = {
+        required: [],
+        optional: []
+      };
+      _this.different = {};
+      _this.errors = [];
+      _this.compiled = {};
+    },
   
     /**
      * Verifica si lo pasado es un objeto literal o no
@@ -860,9 +873,7 @@
         };
       });
     }
-  
   };
-
   /**
    * Constructor del schema.
    * @constructor
@@ -879,35 +890,29 @@
    * const card = new Schema(schema);
    */
   function Schema (obj) {
+    if (!obj) return console.log('Object missing ', obj);
     this.schema = Object.assign({}, obj);
-    this.missings = {
-      required: [],
-      optional: []
-    };
-    this.different = {};
-    this.errors = [];
-    this.compiled = {};
+    uSchema.initValues(this);
   };
-
   /**
    * Fusiona el objeto pasado con el schema creado
    * @param {Object} [obj] Objeto que se necesita compilar con el squema creado.
    * @returns {Object} El objeto fusionado con los valores por defecto en el esquema (si es que existen claro).
    */
   Schema.prototype.compile = function (obj) {
-    if (obj) {
-      console.log('objeto a procesar: ', obj);
-      this.validate(obj);
-    }
+    if (obj) this.validate(obj);
     return this.missings.required.length ? false : this.compiled;
   };
-  
   /**
    * Valida si un objeto cumple con el schema designado.
    * @param {Object} response Objeto que comunmente se obtiene de un 'response' en una solicitud ajax
    * @returns {Boolean} Indica si el objeto pasado es válido o no con el schema.
    */
   Schema.prototype.validate = function (response) {
+    // resetting previus values
+    uSchema.initValues(this);
+    
+    // init
     const schema = this.schema,
           _this = this;
     let retorno = true; // by default, is valid :)
@@ -2263,9 +2268,7 @@ Smart.prototype.createComponent = function (name, obj) {
   let cData = null;
   if (component.hasOwnProperty('schema')) {
     if (!component.schema.validate(obj)) return this.utils.regError('Data inválida', 'No fué posible crear el componente "' + name + '", ya que su data es inválida.');
-    console.log('la data a compilar es: ', obj);
     cData = component.schema.compile(obj);
-    console.log('la data compilada es: ', cData);
   };
 
   // Building template

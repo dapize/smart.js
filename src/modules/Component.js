@@ -62,9 +62,7 @@ Smart.prototype.createComponent = function (name, obj) {
   let cData = null;
   if (component.hasOwnProperty('schema')) {
     if (!component.schema.validate(obj)) return this.utils.regError('Data inválida', 'No fué posible crear el componente "' + name + '", ya que su data es inválida.');
-    console.log('la data a compilar es: ', obj);
     cData = component.schema.compile(obj);
-    console.log('la data compilada es: ', cData);
   };
 
   // Building template
