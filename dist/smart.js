@@ -2222,7 +2222,6 @@ Smart.prototype.registerComponent = function (name, obj) {
   SmartRegisterComponent.prototype = Object.create(SmartEvents.prototype);
   SmartRegisterComponent.prototype.constructor = SmartRegisterComponent;
 
-
   // Saving in vault
   const componentOpts = {
     schema: obj.schema ? new Schema(obj.schema) : null,
