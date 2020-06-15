@@ -49,11 +49,13 @@
       description: 'Esta es una descripción extraña'
     });
 
+    /*
     Smart.createComponent('info-card', {
       image: '../../assets/images/premio2.png',
       title: 'Costo Cero 2',
       description: 'Esta es una descripción extraña 2'
     });
+    */
   });
 
   Smart.registerComponent('info-card', {
@@ -98,5 +100,51 @@
     }
   });
 
+
+}(this));
+
+
+(function (root) {
+  /**
+   * Devuelve un objeto de el array liked de atributos obtenidos de un nodo.
+   * @param {Array} arr Array liked de atributos de un Nodo.
+   * @param {Object} obj Objeto vacio contenedor de los atributos.
+   * @return {Object}
+   */
+  const toObject = function (arr, obj) {
+    const item = arr.shift();
+    obj[item.name] = item.value;
+    return arr.length ? toObject(arr, obj) : obj;
+  };
+
+  /**
+   * Obtiene los atributos de un Nodo HTML como objeto.
+   * @param {Object} Node Nodo HTML.
+   * @return {Object}
+   */
+  const getAttributes = function (Node) {
+    const attrs = Node.attributes;
+    if (!attrs.length) {
+      let childs = Node.children;
+      if (!childs.length) return false;
+      let attrName, obj;
+      childs = Array.prototype.filter.call(childs, function (child) {
+        attrName = child.nodeName.toLowerCase();
+        if (attrName.substring(0, 3) === 'a-') {
+          // getAttributes()
+        } else {
+          return false;
+        }
+      });
+      return childs.length ? childs : false;
+    } else {
+      const arAttrs = Smart.utils.toArray(attrs);
+      return toObject(arAttrs, {});
+    }
+  };
+
+  const myInfoCard = document.querySelector('c-info-card');
+  const myAttrs = getAttributes(myInfoCard);
+  console.dir(myAttrs);
 
 }(this));
