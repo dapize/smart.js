@@ -5,6 +5,7 @@
  * @returns {Smart} Instancia del constructor 'Smart'
  */
 function Smart(obj) {
+  this.version = '1.0Alpha';
   if (!obj) obj = {};
   SmartEvents.call(this);
   this.components = new Map();
