@@ -1,0 +1,26 @@
+{
+  "name": "smartjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "browser-sync . --directory",
+    "serve:watch": "browser-sync . -w --directory",
+    "build": "node scripts/build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dapize/smartjs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dapize/smartjs/issues"
+  },
+  "homepage": "https://github.com/dapize/smartjs#readme",
+  "devDependencies": {
+    "browser-sync": "^2.26.7",
+    "terser": "^4.6.4"
+  }
+}
