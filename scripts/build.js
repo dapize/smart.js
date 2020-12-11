@@ -70,6 +70,7 @@ ${libs}
   'use strict';
 ${content}
   // Export SmartJS
+  if (window) window.Smart = Smart;
   if (typeof module === "object" && module.exports) {
     module.exports = Smart;
   } else {

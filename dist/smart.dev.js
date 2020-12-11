@@ -1846,21 +1846,8 @@ Smart.prototype.buildComponent = function (node, cb) {
   const props = instUbc.saveData(node);
 
   // Procesing...
-  if (this.registered.has(name)) return this.createComponent(name, props, instUbc.created.bind(instUbc)); // if is registered already
-
-  // Callback Component Registered
-  const cbRegistered = function (event) {
-    if (event.detail.name === name) {
-      _this.removeEventListener('component:registered', cbRegistered);
-      _this.createComponent(name, props, instUbc.created.bind(instUbc))
-    }
-  };
-
-  // Attaching registered event component to build hem.
-  this.addEventListener('component:registered', cbRegistered);
-
-  // Getting componente
-  if (!this.loading.has(name)) this.loadComponent(name);
+  if (!this.registered.has(name)) return this.utils.regError('Sin registrar', 'El componente no puede ser construido porque no a sido registrado previamente.');
+  this.createComponent(name, props, instUbc.created.bind(instUbc)); // if is registered already
 };
 
 /**
@@ -1912,6 +1899,7 @@ Smart.prototype.mountComponent = function (obj, cb) {
 
 
   // Export SmartJS
+  if (window) window.Smart = Smart;
   if (typeof module === "object" && module.exports) {
     module.exports = Smart;
   } else {
