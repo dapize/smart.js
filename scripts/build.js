@@ -5,6 +5,9 @@ const Terser = require('terser');
 const sourceFolder = './src/';
 const libsFolder = sourceFolder + 'libs/';
 const modulesFolder = sourceFolder + 'modules/';
+const eventsFolder = modulesFolder + 'events/';
+const utilsFolder = sourceFolder + 'utils/';
+const componentFolder = modulesFolder + 'component/';
 
 // utils
 const readFile = filepath => fs.readFileSync(filepath);
@@ -24,18 +27,38 @@ const minifer = function (code) {
 
 // Libs
 const allLibs = [
-  libsFolder + 'mustache.js',
-  libsFolder + 'schema.js',
-  libsFolder + 'layouter.js'
+  libsFolder + 'squirrelly.js',
+  libsFolder + 'schema.js'
 ];
 const libs = joiner(allLibs);
 
+
 // Core
 const files = [
-  modulesFolder + 'events.js',
-  sourceFolder + 'constructor.js',
-  sourceFolder + 'utils.js',
-  modulesFolder + 'component.js',
+  // Events
+  eventsFolder + 'constructor.js',
+  eventsFolder + 'addEventListener.js',
+  eventsFolder + 'removeEventListener.js',
+  eventsFolder + 'dispatchEvent.js',
+
+  // Base
+  sourceFolder + 'main.js',
+
+  // Utils
+  utilsFolder + 'attrsCleaner.js',
+  utilsFolder + 'forRecur.js',
+  utilsFolder + 'getProps.js',
+  utilsFolder + 'isComponent.js',
+  utilsFolder + 'regError.js',
+  utilsFolder + 'toArray.js',
+
+  // Component
+  componentFolder + 'notify.js',
+  componentFolder + 'search.js',
+  componentFolder + 'register.js',
+  componentFolder + 'create.js',
+  componentFolder + 'build.js',
+  componentFolder + 'mount.js',
 ];
 if (!fs.existsSync('./dist')) fs.mkdirSync('./dist');
 
@@ -45,19 +68,19 @@ const smartCode = `
 ${libs}
 (function (root) {
   'use strict';
-
 ${content}
-
   // Export SmartJS
   if (typeof module === "object" && module.exports) {
     module.exports = Smart;
   } else {
     root.Smart = Smart;
   }
-})(this);`
-const smartPath = './dist/smart.js';
-fs.writeFileSync(smartPath, smartCode, 'utf8');
+})(this);
+`;
 
-let smartPathMin = smartPath.split('.');
-smartPathMin.pop();
-fs.writeFileSync('.' + smartPathMin.join('') + '.min.js', minifer(smartCode), 'utf8');
+const args = process.argv;
+if (args.length >= 3) {
+  if (args.includes('-dev')) fs.writeFileSync('./dist/smart.dev.js', smartCode, 'utf8');
+} else {
+  fs.writeFileSync('./dist/smart.js', minifer(smartCode), 'utf8');
+}

@@ -19,7 +19,7 @@
       _this.errors = [];
       _this.compiled = {};
     },
-  
+
     /**
      * Verifica si lo pasado es un objeto literal o no
      * @memberof uSchema
@@ -35,9 +35,9 @@
     objLiteral: function (obj) {
       return Object.prototype.toString.call(obj).toLowerCase() === '[object object]'
     },
-  
+
     typesAccepted: ['string', 'number', 'boolean', 'array', 'object'],
-  
+
     /**
      * Devuelve el tipo de dato de una propiedad en un ojeto
      * @memberof uSchema
@@ -53,7 +53,7 @@
       obj: function (value) {
         return Array.isArray(value) ? 'array' : typeof value;
       },
-  
+
       /**
        * Devuelve el tipo de dato de una propiedad de un objeto schema.
        * @memberof uSchema.getType
@@ -66,7 +66,7 @@
           retorno = 'mixed';
         } else {
           if (uSchema.objLiteral(value)) {
-            retorno = value.hasOwnProperty('type') ? value.type : 'object';
+            retorno = value.hasOwnProperty('type') ? this.schema(value.type) : 'object';
           } else {
             const typeOfVal = typeof value;
             if (typeOfVal === 'string') {
@@ -79,7 +79,7 @@
         return retorno;
       }
     },
-  
+
     /**
      * Registra incidentes dentro de un objeto, para que sirva de log o para el compilado.
      * @memberof uSchema
@@ -101,7 +101,7 @@
       }
       return retorno;
     },
-  
+
     /**
      * Realiza un merge de los registros obtenidos por el tratado de un subschema.
      * @memberof uSchema
@@ -114,14 +114,14 @@
       // ERRORS
       const itemReg = schema.errors;
       if (itemReg.length) target.errors = target.errors.concat(itemReg);
-      
+
       // MISSINGS
       let missing;
       ['required', 'optional'].forEach(function (item) {
         missing = schema.missings[item];
         if (missing.length) target.missings[item] = target.missings[item].concat(missing);
       });
-      
+
       // DIFFERENT AND COMPILED
       let currentSchema;
       ['different', 'compiled'].forEach(function (objName) {
@@ -153,6 +153,11 @@
     this.schema = Object.assign({}, obj);
     uSchema.initValues(this);
   };
+
+  /**
+   * Muestra la versión actual de la librería.
+   */
+  Schema.version = '1.0.2Beta';
   /**
    * Fusiona el objeto pasado con el schema creado
    * @param {Object} [obj] Objeto que se necesita compilar con el squema creado.
@@ -170,22 +175,22 @@
   Schema.prototype.validate = function (response) {
     // resetting previus values
     uSchema.initValues(this);
-    
+
     // init
     const schema = this.schema,
           _this = this;
     let retorno = true; // by default, is valid :)
-  
+
     Object.keys(schema).forEach(function (property) {
       // Data form schema
       const valPropSchema = schema[property];
       const getTypeValSchema = uSchema.getType.schema(valPropSchema);
-  
+
       if (response.hasOwnProperty(property)) {
         // Data from response
         const valPropObj = response[property];
         const getTypeValObj = uSchema.getType.obj(valPropObj);
-  
+
         switch (getTypeValSchema) {
           case 'string':
           case 'number':
@@ -202,7 +207,7 @@
               uSchema.reg(_this.compiled, valPropObj, property)
             }
             break;
-          
+
           case 'object':
             if (getTypeValObj === 'object') {
               if (valPropSchema.hasOwnProperty('properties')) {
@@ -223,13 +228,14 @@
               }
             }
             break;
-          
+
           case 'mixed':
-            const typesValid = valPropSchema.filter(function (type) {
+            const arrTypes = Array.isArray(valPropSchema) ? valPropSchema : valPropSchema.type;
+            const typesValid = arrTypes.filter(function (type) {
               return type === getTypeValObj;
             });
             // no body match with any types items.
-            if (!typesValid.length && valPropSchema.required) { 
+            if (!typesValid.length && valPropSchema.required) {
               retorno = false;
               uSchema.reg(_this.different, {
                 current: getTypeValObj,
@@ -240,7 +246,7 @@
               uSchema.reg(_this.compiled, valPropObj, property)
             }
             break;
-  
+
           default:
             console.log('format type dont accepted: ' + getTypeValSchema);
             retorno = false;
@@ -254,14 +260,14 @@
           missing = 'optional';
         }
         uSchema.reg(_this.missings[missing], property);
-        if (valPropSchema.default) _this.compiled[property] = valPropSchema.default;
+        if (valPropSchema.hasOwnProperty('default')) _this.compiled[property] = valPropSchema.default;
       }
     });
-  
+
     // Returning
     return retorno;
   };
-  
+
   // EXPORTING
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
