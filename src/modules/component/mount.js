@@ -18,7 +18,7 @@ Smart.prototype.mountComponent = function (obj, cb) {
     // Inserting styles, if have styles of course
     const name = this.utils.isComponent(obj.gross);
     const objComp = this.registered.get(name);
-    if (objComp.styles) {
+    if (objComp.styles && !document.getElementById(name)) {
       const tagStyle = document.createElement("style");
       tagStyle.type = "text/css";
       tagStyle.innerHTML = objComp.styles;
