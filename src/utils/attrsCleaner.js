@@ -6,7 +6,8 @@
  */
 Smart.prototype.utils.attrsCleaner = function (attrs, node, cb) {
   const attr = attrs.shift();
-  if (attr.value.trim() === "[]") {
+  const valueTrim = attr.value.trim();
+  if (valueTrim === "[]" || valueTrim === "[undefined]" || valueTrim === "undefined") {
     if (attr.name === 'value') node.value = ''; // fallback para IE
     node.removeAttribute(attr.name);
   } else {
