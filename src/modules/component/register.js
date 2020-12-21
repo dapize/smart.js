@@ -15,6 +15,15 @@ Smart.prototype.registerComponent = function (name, obj) {
     );
   if (!obj) obj = {};
 
+  // Inserting styles, if have styles of course
+  if (obj.styles) {
+    const tagStyle = document.createElement("style");
+    tagStyle.type = "text/css";
+    tagStyle.innerHTML = obj.styles;
+    tagStyle.id = name;
+    document.body.appendChild(tagStyle);
+  };
+
   // Creating constructor
   function CompInstace() {
     SmartEvents.call(this, name);

@@ -1,7 +1,7 @@
 /**
  * Monta un componente
  * @param {Object} obj Objeto contenedor con nodos y propiedades.
- * @param {Object} [obj.name] Nombre del componente a montar.
+ * @param {Object} obj.name Nombre del componente a montar.
  * @param {Object} obj.gross Nodo HTML en estado bruto.
  * @param {Object} obj.builded Nodo HTML del componente yá construido.
  * @param {Object} [obj.props] Propiedades del componente.
@@ -15,17 +15,6 @@ Smart.prototype.mountComponent = function (obj, cb) {
   // Mounting
   let grossParent = obj.gross.parentNode;
   if (grossParent) {
-    // Inserting styles, if have styles of course
-    const name = this.utils.isComponent(obj.gross);
-    const objComp = this.registered.get(name);
-    if (objComp.styles && !document.getElementById(name)) {
-      const tagStyle = document.createElement("style");
-      tagStyle.type = "text/css";
-      tagStyle.innerHTML = objComp.styles;
-      tagStyle.id = name;
-      document.body.appendChild(tagStyle);
-    };
-
     // Reemplazing node
     grossParent.replaceChild(obj.builded, obj.gross);
     this.mounted.set(obj.gross, {
@@ -35,7 +24,7 @@ Smart.prototype.mountComponent = function (obj, cb) {
 
     // Notify && CB
     const detail = {
-      name: name,
+      name: obj.name,
       gross: obj.gross,
       builded: obj.builded,
       props: obj.props

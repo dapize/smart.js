@@ -58,9 +58,10 @@ uBc.prototype.created = function (node, props, constr, instance) {
           gross: compNode,
           builded: obj.node,
           props: obj.props
-        });
+        }, forCB);
+      } else {
+        forCB();
       }
-      forCB();
     })
   }, function () {
     _this.haveChildren(_this.gross, function (childs) {
@@ -145,8 +146,6 @@ uBc.prototype.childrens = function (childs, contentNode) {
  * @param {buildCallBack} [cb] Function callback.
  */
 Smart.prototype.buildComponent = function (node, cb) {
-  const _this = this;
-
   // check if the node passed if a component
   const name = this.utils.isComponent(node); // return a 'Truthy value' (name of the component)
   if (!name) return this.utils.regError('Componente inválido', 'El Nodo pasado NO es un componente, no se puede procesar');
@@ -161,6 +160,6 @@ Smart.prototype.buildComponent = function (node, cb) {
   const props = instUbc.saveData(node);
 
   // Procesing...
-  if (!this.registered.has(name)) return this.utils.regError('Sin registrar', 'El componente no puede ser construido porque no a sido registrado previamente.');
+  if (!this.registered.has(name)) return this.utils.regError('Sin registrar', 'El componente "' + name + '" no puede ser construido porque no a sido registrado previamente.');
   this.createComponent(name, props, instUbc.created.bind(instUbc)); // if is registered already
 };

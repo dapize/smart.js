@@ -1551,6 +1551,15 @@ Smart.prototype.registerComponent = function (name, obj) {
     );
   if (!obj) obj = {};
 
+  // Inserting styles, if have styles of course
+  if (obj.styles) {
+    const tagStyle = document.createElement("style");
+    tagStyle.type = "text/css";
+    tagStyle.innerHTML = obj.styles;
+    tagStyle.id = name;
+    document.body.appendChild(tagStyle);
+  };
+
   // Creating constructor
   function CompInstace() {
     SmartEvents.call(this, name);
@@ -1744,9 +1753,10 @@ uBc.prototype.created = function (node, props, constr, instance) {
           gross: compNode,
           builded: obj.node,
           props: obj.props
-        });
+        }, forCB);
+      } else {
+        forCB();
       }
-      forCB();
     })
   }, function () {
     _this.haveChildren(_this.gross, function (childs) {
@@ -1831,8 +1841,6 @@ uBc.prototype.childrens = function (childs, contentNode) {
  * @param {buildCallBack} [cb] Function callback.
  */
 Smart.prototype.buildComponent = function (node, cb) {
-  const _this = this;
-
   // check if the node passed if a component
   const name = this.utils.isComponent(node); // return a 'Truthy value' (name of the component)
   if (!name) return this.utils.regError('Componente inválido', 'El Nodo pasado NO es un componente, no se puede procesar');
@@ -1847,14 +1855,14 @@ Smart.prototype.buildComponent = function (node, cb) {
   const props = instUbc.saveData(node);
 
   // Procesing...
-  if (!this.registered.has(name)) return this.utils.regError('Sin registrar', 'El componente no puede ser construido porque no a sido registrado previamente.');
+  if (!this.registered.has(name)) return this.utils.regError('Sin registrar', 'El componente "' + name + '" no puede ser construido porque no a sido registrado previamente.');
   this.createComponent(name, props, instUbc.created.bind(instUbc)); // if is registered already
 };
 
 /**
  * Monta un componente
  * @param {Object} obj Objeto contenedor con nodos y propiedades.
- * @param {Object} [obj.name] Nombre del componente a montar.
+ * @param {Object} obj.name Nombre del componente a montar.
  * @param {Object} obj.gross Nodo HTML en estado bruto.
  * @param {Object} obj.builded Nodo HTML del componente yá construido.
  * @param {Object} [obj.props] Propiedades del componente.
@@ -1868,17 +1876,6 @@ Smart.prototype.mountComponent = function (obj, cb) {
   // Mounting
   let grossParent = obj.gross.parentNode;
   if (grossParent) {
-    // Inserting styles, if have styles of course
-    const name = this.utils.isComponent(obj.gross);
-    const objComp = this.registered.get(name);
-    if (objComp.styles && !document.getElementById(name)) {
-      const tagStyle = document.createElement("style");
-      tagStyle.type = "text/css";
-      tagStyle.innerHTML = objComp.styles;
-      tagStyle.id = name;
-      document.body.appendChild(tagStyle);
-    };
-
     // Reemplazing node
     grossParent.replaceChild(obj.builded, obj.gross);
     this.mounted.set(obj.gross, {
@@ -1888,7 +1885,7 @@ Smart.prototype.mountComponent = function (obj, cb) {
 
     // Notify && CB
     const detail = {
-      name: name,
+      name: obj.name,
       gross: obj.gross,
       builded: obj.builded,
       props: obj.props
